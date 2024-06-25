@@ -160,37 +160,44 @@
         </div>
         <button onclick="checkSpeed()" type="button" class="btn active"
             style="font-size: 2rem;color: white; background-color: #211212;">
-            <img src="./performance.png" alt="Speed Test Icon" style="max-width: 30px; max-height: 50px;">   Speed Test
+            <img src="./performance.png" alt="Speed Test Icon" style="max-width: 30px; max-height: 50px;"> Speed Test
         </button>
 
         <div id="result" class="result"></div>
         <div id="loader" class="loader" style="display: none;"></div>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
         function checkSpeed() {
-            $('#loader').show();
-            $('#result').html('');
-            $.ajax({
-                url: '/speed',
-                type: 'GET',
-                success: function (data) {
-                    $('#loader').hide();
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('result').innerHTML = '';
+
+            fetch('/speed')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loader').style.display = 'none';
                     if (data.error) {
-                        $('#result').text(`Error: ${data.error}`);
+                        document.getElementById('result').textContent = `Error: ${data.error}`;
                     } else {
-                        $('#result').html(`
-                            <div><i class="fa-solid fa-wifi"></i> Ping: ${data.ping} ms</div>
-                            <div><i class="fa-solid fa-download"></i> Download Speed: ${data.download} Mbps</div>
-                            <div><i class="fa-solid fa-upload"></i> Upload Speed: ${data.upload} Mbps</div>
-                        `);
+                        document.getElementById('result').innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: center; margin: 10px 0;">
+                                <i class="fa-solid fa-download" style="font-size: 24px; color: #2980b9; margin-right: 10px;"></i>
+                                <h2 style="font-size: 2rem; color: #333;">Download Speed: ${data.download} Mbps</h2>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center; margin: 10px 0;">
+                                <i class="fa-solid fa-upload" style="font-size: 24px; color: #2980b9; margin-right: 10px;"></i>
+                                <h2 style="font-size: 2rem; color: #333;">Upload Speed: ${data.upload} Mbps</h2>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center; margin: 10px 0;">
+                                <i class="fa-solid fa-wifi" style="font-size: 24px; color: #2980b9; margin-right: 10px;"></i>
+                                <h2 style="font-size: 2rem; color: #333;">Ping: ${data.ping} ms</h2>
+                            </div>
+                        `;
                     }
-                },
-                error: function () {
-                    $('#loader').hide();
-                    $('#result').text('Error performing speed test.');
-                }
-            });
+                })
+                .catch(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('result').textContent = 'Error performing speed test.';
+                });
         }
     </script>
 </body>
